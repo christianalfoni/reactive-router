@@ -11,7 +11,7 @@ When MVC was moved to the frontend, the router was moved with it as a controller
 The **reactive-router** has no intention of being a controller layer. It just listens to changes in your application state and sets the current url based on that. When urls are changed by the browser you can trigger a request to your controller layer, it being a FLUX dispatcher/action creator or some other type of controller layer.
 
 ## What does this give me?
-The reactive-router is a small snippet of code. There is no complex logic to make routes match the layout of your page, fetching of data etc. That is not the job of the router. The job of the router is to listen for URL changes in your application state, and dispatch requests to the controller when the browser changes the url. Now all the logic for application state and fetching data is contained in your controller layer, not shared with the router.
+The reactive-router is a small snippet of code. There is no complex logic to make routes match the layout of your page, fetching of data etc. That is not the job of the router. The job of the router is to listen for URL changes in your application state, and dispatch requests to the controller when that happens, or the browser changes the url. Now all the logic for application state and fetching data is contained in your controller layer, not shared with the router.
 
 The reactive-router also gives you A LOT of flexibility. No longer your router controls how components/views should be composed, you decide what a route change means. It can be anything from filtering a list, to changing what component/view to display to whatever a URL should mean in your app.
 
