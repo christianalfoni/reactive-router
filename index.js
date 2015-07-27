@@ -1,6 +1,7 @@
 const Router = function (routes) {
 
   var matchRoutes = function (currentUrl) {
+    var fragments = currentUrl.split('/');
     var result = Object.keys(routes).reduce(function (info, url) {
       var length = url.split('/').length;
       if (Router.match(currentUrl, url) && info.hit > info.currentHit) {
@@ -13,11 +14,12 @@ const Router = function (routes) {
       cb: null,
       currentHit: 0,
       params: null,
-      hit: currentUrl.split('/').length
+      hit: fragments.length
     });
     result.cb({
       url: currentUrl,
-      params: result.params
+      params: result.params,
+      fragments: fragments
     });
   };
 
