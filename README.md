@@ -25,7 +25,7 @@ What this means is that you stop thinking about your UI as a reflection of the U
 
 ## How does it work?
 
-I will show this example using the [cerebral controller project(https://github.com/christianalfoni/cerebral).
+I will show this example using the [cerebral controller project](https://github.com/christianalfoni/cerebral).
 ```js
 import ReactiveRouter from 'reactive-router';
 import controller from './controller.js';
