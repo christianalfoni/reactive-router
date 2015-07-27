@@ -114,6 +114,8 @@ const Comp = React.createClass({
             return <Home/>;
         case 'messages':
             return <Messages/>
+        case 'error':
+            return <Error/>
     }
   }
 });
