@@ -6,43 +6,93 @@ A router that is controlled by your application state
 Note that this project is **experimental**.
 
 ## What makes reactive-router different?
-When MVC was moved to the frontend, the router was moved with it as a controller layer. The job of a controller is to take requests from the view and make changes to your model layer. The problem with using the controller as the controller layer is that not all requests for state changes are related to a route. Some of the state changes are done through the router and some of them are done directly to the model layer or through some other controller layer. This makes things very complex. You can [watch this video](https://www.youtube.com/watch?v=xCIv4-Q2dtA) to learn more about this statement.
+When the router moved to the frontend it has been given a lot of different jobs. Keep track of and parse the current url, control the VIEW layer and often do data-fetching and handling transition states. The reactive-router is going back to the roots of what a router does, and that is pass a URL request to the controller layer of your application.
 
-The **reactive-router** has no intention of being a controller layer. It just listens to changes in your application state and sets the current url based on that. When urls are changed by the browser you can trigger a request to your controller layer, it being a FLUX dispatcher/action creator or some other type of controller layer.
+Some more info
+- [reactive-router](https://www.youtube.com/watch?v=6tUbnDHq8xs)
+- [Cerebral - A state controller with its own debugger](https://www.youtube.com/watch?v=xCIv4-Q2dtA)
 
-## What does this give me?
-The reactive-router is a small snippet of code. There is no complex logic to make routes match the layout of your page, fetching of data etc. That is not the job of the router. The job of the router is to listen for URL changes in your application state, and dispatch requests to the controller when that happens, or the browser changes the url. Now all the logic for application state and fetching data is contained in your controller layer, not shared with the router.
+## Application state, not URLs
+> Your VIEW layer should not care about what the URL is, it should care about what state your application is in
 
-The reactive-router also gives you A LOT of flexibility. No longer your router controls how components/views should be composed, you decide what a route change means. It can be anything from filtering a list, to changing what component/view to display to whatever a URL should mean in your app.
+The way to think about the **reactive-router** is this:
+
+1. A url triggers and the reactive-router triggers a related method on your controller layer
+2. Your **controller** layer converts this request to application state. An example of this would be `/inbox` which puts your application in `{currentFolder: 'inbox'}`
+3. Your **view** layer does not check the url to figure out what to render, it checks the `currentFolder` state
+
+What this means is that you stop thinking about your UI as a reflection of the URLs, because it does not matter. What matters is the state you want to put your application in. A URL is just a way to trigger some state, it being setting what components to render, what filters to set, what item in a list to highlight etc.
 
 ## How does it work?
 
+I will show this example using the [cerebral controller project](https://github.com/christianalfoni/cerebral).
 ```js
 import ReactiveRouter from 'reactive-router';
+import controller from './controller.js';
 
-// Some state/store library
-import state from './state.js';
-
-// Some actions
-const displayHomeAction = function (route) {
-    state.set('url', route.url);
-    state.set('currentView', 'home');
+// ACTIONS
+const setCurrentUrl = function (args, state) {
+  state.set('url', args.url);
 };
 
-const displayMessagesAction = function (route) {
-    state.set('url', route.url);
-    state.set('currentView', 'message');
-    state.set('isLoadingMessage', true);
-    ajax.get('/messages/' + route.params.id).then(function (message) {
-      state.set('currentMessage', message);
-      state.set('isLoadingMessage', false);
+const setCurrentPage = function (args, state) {
+  state.set('currentPage', args.fragments[0]);
+};
+
+const setLoading = function (args, state) {
+  state.set('isLoading', true);
+};
+
+const unsetLoading = function (args, state) {
+  state.set('isLoading', false);
+};
+
+const getMessageByParamsId = function (args, state, promise) {
+  args.utils.ajax.get('/messages/' + args.params.id)
+    .then(function (message) {
+        promsise.resolve({message: message});
+    })
+    .catch(function (error) {
+        promise.reject({error: error});
     });
 };
 
-// Define the router
+const setCurrentMessage = function (args, state) {
+  state.set('currentMessage', args.message);
+};
+
+const setError = function (args, state) {
+  state.set('error', args.error);
+  state.set('url', '/error');
+};
+
+// SIGNAL
+controller.signal('homeRouted',
+    setCurrentUrl,
+    setCurrentPage
+);
+
+controller.signal('messageRouted',
+    setCurrentUrl,
+    setCurrentPage,
+    setLoading,
+    [getMessageByParamsId, {
+      resolve: [setMessage],
+      error: [setError]
+    }],
+    unsetLoading
+);
+
+controller.signal('errorRouted',
+    setCurrentUrl,
+    setCurrentPage
+);
+
+// ROUTER
 const router = ReactiveRouter({
-  '/': displayHomeAction,
-  '/messages/:id': displayMessageAction
+  '/home': homeRouted,
+  '/messages/:id': messageRouted,
+  '/error': errorRouted
 });
 
 // Listen to state changes and set the url
@@ -52,22 +102,46 @@ state.on('change', function (state) {
 ```
 
 ## Why listen to state changes and set the url?
-If you are familiar with React, you can compare this to an input. Even though the input/router is what caused the change, we want to store the state (value/url) and bring it right back to the input/router. The reason is that now we can manually change the input/router value/url inside our state store and it will be reflected in the UI.
+If you are familiar with React, you can compare this to an input. Even though the input/router is what caused the change, we want to store the state (value/url) and bring it right back to the input/router. The reason is that now we can manually change the input/router value/url inside our state store and it will be reflected in the UI, as you can see an example of with the `setError` action. To change a url you can trigger your own "change url" signal, or just change the url normally.
 
-*Example with React*
+*Handle nesting*
 ```js
-import state from './state.js';
+@State({currentPage: ['currentPage'])
+const Comp = React.createClass({
+  render() {
+    switch (this.props.currentPage) {
+        case 'home':
+            return <Home/>;
+        case 'messages':
+            return <Messages/>
+        case 'error':
+            return <Error/>
+    }
+  }
+});
+```
 
-const changeUrl = function (url) {
-  state.set('url', url);
-};
-
+*Trigger a route*
+```js
 const Comp = React.createClass({
   render() {
     return (
-      <button onClick={() => changeUrl('/foo')}>Change url</button>
+      <a href="#/messages/123">Open message 123</a>
     );
   }
 });
 ```
-Now we are changing the URL of the application inside our state store, not from the router. The router is *reactive*, it reacts to the state change of the url. This allows you to change the current route inside the actions.
+
+*Trigger route with state change*
+```js
+
+controller.signal('urlChanged', setCurrentUrl);
+
+const Comp = React.createClass({
+  render() {
+    return (
+      <a onClick={() => this.props.signals.urlChanged({url: '/messages/123'})}>Open message 123</a>
+    );
+  }
+});
+```
