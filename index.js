@@ -1,5 +1,6 @@
 const Router = function (routes) {
 
+  var silent = false;
   var matchRoutes = function (currentUrl) {
     var result = Object.keys(routes).reduce(function (info, url) {
       var length = url.split('/').length;
@@ -22,6 +23,10 @@ const Router = function (routes) {
   };
 
   window.addEventListener('hashchange', function () {
+    if (silent) {
+      silent = false;
+      return;
+    }
     matchRoutes(location.hash.substr(1));
   });
   matchRoutes(location.hash ? location.hash.substr(1) : '/');
@@ -29,6 +34,12 @@ const Router = function (routes) {
   return {
     set: function (url) {
       if (url !== location.hash.substr(1)) {
+        location.hash = url;
+      }
+    },
+    setSilent: function (url) {
+      if (url !== location.hash.substr(1)) {
+        silent = true;
         location.hash = url;
       }
     }
@@ -55,4 +66,4 @@ Router.match = function (currentUrl, url) {
 
 };
 
-export default Router;
+module.exports = Router;

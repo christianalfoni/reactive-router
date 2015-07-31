@@ -70,4 +70,4 @@ const Comp = React.createClass({
   }
 });
 ```
-Now we are changing the URL of the application inside our state store, not from the router. The router is *reactive*, it reacts to the state change of the url.
+Now we are changing the URL of the application inside our state store, not from the router. The router is *reactive*, it reacts to the state change of the url. This allows you to change the current route inside the actions.
