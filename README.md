@@ -1,9 +1,7 @@
 # reactive-router
-A router that is controlled by your application state
+A reactive wrapper around Page JS
 
 > **The URL is like any other state**
-
-Note that this project is **experimental**.
 
 ## What makes reactive-router different?
 When the router moved to the frontend it has been given a lot of different jobs. Keep track of and parse the current url, control the VIEW layer and often do data-fetching and handling transition states. The reactive-router is going back to the roots of what a router does, and that is pass a URL request to the controller layer of your application.
@@ -24,13 +22,16 @@ The way to think about the **reactive-router** is this:
 What this means is that you stop thinking about your UI as a reflection of the URLs, because it does not matter. What matters is the state you want to put your application in. A URL is just a way to trigger some state, it being setting what components to render, what filters to set, what item in a list to highlight etc.
 
 ## How does it work?
+reactive-router is a wrapper around [pagejs](https://visionmedia.github.io/page.js/), a neat little routing library built by **visionmedia**.
 
 I will show this example using the [cerebral controller project](https://github.com/christianalfoni/cerebral).
 ```js
 import ReactiveRouter from 'reactive-router';
 import controller from './controller.js';
 
-// ACTIONS
+/*
+  ACTIONS
+*/
 const setCurrentUrl = function (args, state) {
   state.set('url', args.url);
 };
@@ -66,7 +67,9 @@ const setError = function (args, state) {
   state.set('url', '/error');
 };
 
-// SIGNAL
+/*
+  SIGNALS
+*/
 controller.signal('homeRouted',
     setCurrentUrl,
     setCurrentPage
@@ -88,7 +91,11 @@ controller.signal('errorRouted',
     setCurrentPage
 );
 
-// ROUTER
+/*
+  ROUTER
+  The way you define routes is changed. Pass one object to define all routes. Second argument is any
+  Page JS options
+*/
 const router = ReactiveRouter({
   '/home': homeRouted,
   '/messages/:id': messageRouted,
@@ -99,7 +106,12 @@ const router = ReactiveRouter({
 
 // Listen to state changes and set the url
 state.on('change', function (state) {
-  router.set(state.get('url'));
+  router.set(state.url);
+});
+
+// When remembering state with cerebral, silently set the url
+state.on('remember', function (state) {
+  router.setSilent(state.url);
 });
 ```
 
