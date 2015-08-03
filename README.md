@@ -37,7 +37,7 @@ const setCurrentUrl = function (args, state) {
 };
 
 const setCurrentPage = function (args, state) {
-  state.set('currentPage', args.fragments[0]);
+  state.set('currentPage', args.path.split('/')[1]); // /{page}
 };
 
 const setLoading = function (args, state) {
