@@ -2,12 +2,12 @@ const page = require('page');
 
 const Router = function (routes, options) {
 
+  let isSilent = false;
+
   // register the routes
   Object.keys(routes).map(function (route) {
-    page(route, function (context) {
-      context.url = context.path;
-      context.fragments = context.pathname.split('/');
-      routes[route](context);
+    page(route, function () {
+      !isSilent && routes[route].apply(this, arguments);
     });
   });
 
@@ -20,6 +20,11 @@ const Router = function (routes, options) {
       if (page.current !== url) {
         page(url);
       }
+    },
+    setSilent: function (url) {
+      isSilent = true;
+      this.set(url);
+      isSilent = false;
     }
   };
 

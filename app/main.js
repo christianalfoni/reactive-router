@@ -35,10 +35,10 @@ const App = React.createClass({
   render() {
     return (
       <div>
-        <a style={{color: Router.match(this.state.url, '/foo') ? 'red' : 'blue'}} href="#/foo">Foo</a>
-        <a style={{color: Router.match(this.state.url, '/bar') ? 'red' : 'blue'}} onClick={() => this.signals.urlChanged({url: '/foo/456'})}>Bar</a>
+        <a style={{color: 'blue'}} href="/foo">Foo</a>
+        <a style={{color: 'blue'}} onClick={() => this.signals.urlChanged({path: '/foo/456'})}>Bar</a>
         <div>
-          {Router.match(this.state.url, '/foo') ? <Messages/> : null}
+          <Messages/>
         </div>
       </div>
     );
@@ -46,25 +46,25 @@ const App = React.createClass({
 });
 
 controller.signal('indexRouted', function fooRouted (args, state) {
-  state.set('url', args.url);
+  state.set('url', args.path);
 });
 
 controller.signal('fooRouted', function fooRouted (args, state) {
-  state.set('url', args.url);
+  state.set('url', args.path);
   state.set('messageId', null);
 });
 
 controller.signal('barRouted', function barRouted (args, state) {
-  state.set('url', args.url);
+  state.set('url', args.path);
 });
 
 controller.signal('messageRouted', function messageRoutedd (args, state) {
-  state.set('url', args.url);
+  state.set('url', args.path);
   state.set('messageId', args.params.id);
 });
 
 controller.signal('urlChanged', function urlChanged (args, state) {
-  state.set('url', args.url);
+  state.set('url', args.path);
 });
 
 const router = Router({
@@ -72,6 +72,8 @@ const router = Router({
   '/foo': controller.signals.fooRouted,
   '/bar': controller.signals.barRouted,
   '/foo/:id': controller.signals.messageRouted
+}, {
+  hashbang: true
 });
 
 controller.eventEmitter.on('change', function (state) {
