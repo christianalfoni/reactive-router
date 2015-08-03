@@ -1,3 +1,4 @@
+'use strict';
 const page = require('page');
 
 const Router = function (routes, options) {
