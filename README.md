@@ -93,6 +93,8 @@ const router = ReactiveRouter({
   '/home': homeRouted,
   '/messages/:id': messageRouted,
   '/error': errorRouted
+}, {
+  hashbang: true
 });
 
 // Listen to state changes and set the url
@@ -126,7 +128,7 @@ const Comp = React.createClass({
 const Comp = React.createClass({
   render() {
     return (
-      <a href="#/messages/123">Open message 123</a>
+      <a href="/messages/123">Open message 123</a>
     );
   }
 });
