@@ -24,72 +24,29 @@ What this means is that you stop thinking about your UI as a reflection of the U
 ## How does it work?
 reactive-router is a wrapper around [pagejs](https://visionmedia.github.io/page.js/), a neat little routing library built by **visionmedia**.
 
-I will show this example using the [cerebral controller project](https://github.com/christianalfoni/cerebral).
 ```js
 import ReactiveRouter from 'reactive-router';
-import controller from './controller.js';
+import state from './state.js';
 
-/*
-  ACTIONS
-*/
-const setCurrentUrl = function (args, state) {
-  state.set('url', args.url);
+// state can be a store, controller, actions or whatever is responsible
+// for changing the state of your app. This example is with a state store
+
+// Actions like these can be a lot more generic, but it is just to show you
+const homeRouted = function (context) {
+  state.set('url', context.path);
+  state.set('currentPage', 'home');
 };
 
-const setCurrentPage = function (args, state) {
-  state.set('currentPage', args.path.split('/')[1]); // /{page}
+const messageRouted = function (context) {
+  state.set('url', context.path);
+  state.set('currentPage', 'messages');
+  state.set('currentMessage', context.params.id);
 };
 
-const setLoading = function (args, state) {
-  state.set('isLoading', true);
+const errorRouted = function (context) {
+  state.set('url', context.path);
+  state.set('currentPage', 'error');
 };
-
-const unsetLoading = function (args, state) {
-  state.set('isLoading', false);
-};
-
-const getMessageByParamsId = function (args, state, promise) {
-  args.utils.ajax.get('/messages/' + args.params.id)
-    .then(function (message) {
-        promsise.resolve({message: message});
-    })
-    .catch(function (error) {
-        promise.reject({error: error});
-    });
-};
-
-const setCurrentMessage = function (args, state) {
-  state.set('currentMessage', args.message);
-};
-
-const setError = function (args, state) {
-  state.set('error', args.error);
-  state.set('url', '/error');
-};
-
-/*
-  SIGNALS
-*/
-controller.signal('homeRouted',
-    setCurrentUrl,
-    setCurrentPage
-);
-
-controller.signal('messageRouted',
-    setCurrentUrl,
-    setCurrentPage,
-    setLoading,
-    [getMessageByParamsId, {
-      resolve: [setMessage],
-      error: [setError]
-    }],
-    unsetLoading
-);
-
-controller.signal('errorRouted',
-    setCurrentUrl,
-    setCurrentPage
-);
 
 /*
   ROUTER
@@ -107,10 +64,7 @@ const router = ReactiveRouter({
 // Listen to state changes and set the url
 state.on('change', function (state) {
   router.set(state.url);
-});
-
-// When remembering state with cerebral, silently set the url
-state.on('remember', function (state) {
+  // or silently set, will not trigger the callback
   router.setSilent(state.url);
 });
 ```
@@ -147,15 +101,20 @@ const Comp = React.createClass({
 ```
 
 *Trigger route with state change*
+Now you can change the route from within your actions/controller and the router will react to that.
 ```js
+import ajax from './state.js';
+import state from './state.js';
 
-controller.signal('urlChanged', setCurrentUrl);
-
-const Comp = React.createClass({
-  render() {
-    return (
-      <a onClick={() => this.props.signals.urlChanged({path: '/messages/123'})}>Open message 123</a>
-    );
-  }
-});
+const someAction = function () {
+  ajax.post('/something')
+    .resolve(function (data) {
+      state.set('data', data);
+      state.set('url', '/data');
+    })
+    .catch(function (error) {
+      state.set('error', error);
+      state.set('url', '/error');
+    });
+};
 ```
