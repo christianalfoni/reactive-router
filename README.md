@@ -154,7 +154,7 @@ controller.signal('urlChanged', setCurrentUrl);
 const Comp = React.createClass({
   render() {
     return (
-      <a onClick={() => this.props.signals.urlChanged({url: '/messages/123'})}>Open message 123</a>
+      <a onClick={() => this.props.signals.urlChanged({path: '/messages/123'})}>Open message 123</a>
     );
   }
 });
