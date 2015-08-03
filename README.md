@@ -72,7 +72,7 @@ state.on('change', function (state) {
 ## Why listen to state changes and set the url?
 If you are familiar with React, you can compare this to an input. Even though the input/router is what caused the change, we want to store the state (value/url) and bring it right back to the input/router. The reason is that now we can manually change the input/router value/url inside our state store and it will be reflected in the UI, as you can see an example of with the `setError` action. To change a url you can trigger your own "change url" signal, or just change the url normally.
 
-*Handle nesting*
+#### Handle nesting
 ```js
 @State({currentPage: ['currentPage'])
 const Comp = React.createClass({
@@ -89,7 +89,7 @@ const Comp = React.createClass({
 });
 ```
 
-*Trigger a route*
+#### Trigger a route
 ```js
 const Comp = React.createClass({
   render() {
@@ -100,7 +100,7 @@ const Comp = React.createClass({
 });
 ```
 
-*Trigger route with state change*
+#### Trigger route with state change
 Now you can change the route from within your actions/controller and the router will react to that.
 ```js
 import ajax from './state.js';
