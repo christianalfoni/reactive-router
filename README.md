@@ -15,7 +15,7 @@ Some more info
 
 The way to think about the **reactive-router** is this:
 
-1. A url triggers and the reactive-router triggers a related method on your controller layer
+1. A url triggers and the reactive-router triggers a related method on your controller layer, it being action creators or some other state changing controller
 2. Your **controller** layer converts this request to application state. An example of this would be `/inbox` which puts your application in `{currentFolder: 'inbox'}`
 3. Your **view** layer does not check the url to figure out what to render, it checks the `currentFolder` state
 
