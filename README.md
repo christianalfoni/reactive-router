@@ -50,8 +50,8 @@ const errorRouted = function (context) {
 
 /*
   ROUTER
-  The way you define routes is changed. Pass one object to define all routes. Second argument is any
-  Page JS options
+  The way you define routes is changed. Pass one object to define all routes. 
+  Second argument is any Page JS options
 */
 const router = ReactiveRouter({
   '/home': homeRouted,
