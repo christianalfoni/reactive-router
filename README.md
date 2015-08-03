@@ -21,6 +21,8 @@ The way to think about the **reactive-router** is this:
 
 What this means is that you stop thinking about your UI as a reflection of the URLs, because it does not matter. What matters is the state you want to put your application in. A URL is just a way to trigger some state, it being setting what components to render, what filters to set, what item in a list to highlight etc.
 
+First of all this allows you to trigger a url change by just changing the "url" state inside your state store. It also allows you to define what a url-change actually means. It does not have to be changing out components, it could be highlighting something in a list or trigger some animation.
+
 ## How does it work?
 reactive-router is a wrapper around [pagejs](https://visionmedia.github.io/page.js/), a neat little routing library built by **visionmedia**.
 
