@@ -1,9 +1,9 @@
 'use strict';
-const page = require('page');
+var page = require('page');
 
-const Router = function (routes, options) {
+var Router = function (routes, options) {
 
-  let isSilent = false;
+  var isSilent = false;
 
   // register the routes
   Object.keys(routes).map(function (route) {
