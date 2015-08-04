@@ -32,9 +32,11 @@
     "cerebral-react-immutable-store": "^0.2.1",
     "immutable-store": "^0.5.1",
     "nodeunit": "^0.9.1",
-    "page": "^1.6.3",
     "react": "^0.13.3",
     "webpack": "^1.10.5",
     "webpack-dev-server": "^1.10.1"
+  },
+  "dependencies": {
+    "page": "^1.6.3"
   }
 }
