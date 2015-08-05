@@ -7,8 +7,9 @@ A reactive wrapper around Page JS
 When the router moved to the frontend it has been given a lot of different jobs. Keep track of and parse the current url, control the VIEW layer and often do data-fetching and handling transition states. The reactive-router is going back to the roots of what a router does, and that is pass a URL request to the controller layer of your application.
 
 Some more info
-- [reactive-router](https://www.youtube.com/watch?v=6tUbnDHq8xs)
-- [Cerebral - A state controller with its own debugger](https://www.youtube.com/watch?v=xCIv4-Q2dtA)
+- [Article: Why we are doing MVC and FLUX wrong](http://www.christianalfoni.com/articles/2015_08_02_Why-we-are-doing-MVC-and-FLUX-wrong)
+- [Video: reactive-router](https://www.youtube.com/watch?v=6tUbnDHq8xs)
+- [Video: Cerebral - A state controller with its own debugger](https://www.youtube.com/watch?v=xCIv4-Q2dtA)
 
 ## Application state, not URLs
 > Your VIEW layer should not care about what the URL is, it should care about what state your application is in
