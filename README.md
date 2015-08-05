@@ -73,7 +73,7 @@ state.on('change', function (state) {
 ```
 
 ## Why listen to state changes and set the url?
-If you are familiar with React, you can compare this to an input. Even though the input/router is what caused the change, we want to store the state (value/url) and bring it right back to the input/router. The reason is that now we can manually change the input/router value/url inside our state store and it will be reflected in the UI, as you can see an example of with the `setError` action. To change a url you can trigger your own "change url" signal, or just change the url normally.
+If you are familiar with React, you can compare this to an input. Even though the input/router is what caused the change, we want to store the state (value/url) and bring it right back to the input/router. The reason is that now we can manually change the input/router value/url inside our state store and it will be reflected in the UI, as you can see an examples of with the actions above. To change a url you can trigger your own "change url" signal, or just change the url normally with a hyperlink.
 
 #### Handle nesting
 ```js
