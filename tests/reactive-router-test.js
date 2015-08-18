@@ -58,5 +58,18 @@ module.exports = {
     });
 
     test.done();
+  },
+
+  _findMatchingRoute: function(test) {
+    var activeRoute = this.router._findMatchingRoute(this.routes, '/foo/123');
+    test.equal(activeRoute, '/foo/:id');
+
+    test.done();
+  },
+
+  _matchRoute: function(test) {
+    var matchedRoute = this.router._matchRoute(this.routes, '/foo/123/baz/abc');
+    test.equal(matchedRoute, 'fooIdBazGuidCallback /foo/123/baz/abc');
+    test.done();
   }
 };

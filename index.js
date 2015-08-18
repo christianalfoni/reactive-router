@@ -4,12 +4,12 @@
 var Router = function(routes) {
   return {
     listen: function() {
-      this.listener = createHistory().listen(function(location) {
-        this._matchRoute(location);
+      this.urlListener = createHistory().listen(function(location) {
+        this._matchRoute(routes, location);
       });
     },
 
-    stopListening: function() { this.listen.unlisten(); },
+    stopListening: function() { this.urlListener.unlisten(); },
 
     set: function(url) {
       //todo
@@ -22,17 +22,17 @@ var Router = function(routes) {
     },
 
     // "private" methods
-    _matchRoute: function(location) {
+    _matchRoute: function(routes, location) {
       var route = this._findMatchingRoute(routes, location);
-      this._invokeCallback(routes, route, locaion);
+      return this._invokeCallback(routes, route, location);
     },
 
     _findMatchingRoute: function(routes, location) {
-      return (
-        Object.keys(routes).find(function(key) {
-          return this.match(key, location);
-        })
-      );
+      var self = this;
+
+      return Object.keys(routes).filter(function(route) {
+        return self._match(route, location);
+      }).shift();
     },
 
     _match: function(route, location) {
