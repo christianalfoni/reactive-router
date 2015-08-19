@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack-dev-server --devtool eval --progress --colors --content-base build",
+    "start": "webpack-dev-server --devtool eval --progress --colors --content-base build --history-api-fallback",
     "test": "node test"
   },
   "repository": {
@@ -37,6 +37,6 @@
     "webpack-dev-server": "^1.10.1"
   },
   "dependencies": {
-    "page": "^1.6.3"
+    "history": "^1.4.0"
   }
 }
