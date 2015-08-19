@@ -1,4 +1,8 @@
-var Router = require('../index');
+var Router             = require('../index');
+var _match             = Router._match;
+var _findMatchingRoute = Router._findMatchingRoute;
+var _parseParams       = Router._parseParams;
+var _parsePath         = Router._parsePath;
 
 module.exports = {
   setUp: function (callback) {
@@ -9,7 +13,7 @@ module.exports = {
       '/foo/:id/baz':       function(arg){ return 'fooIdBazCallback ' + arg; },
       '/foo/:id/baz/:guid': function(arg){ return 'fooIdBazGuidCallback ' + arg; }
     };
-    this.router = Router(this.routes);
+    this.router = Router(this.routes, {});
     callback();
   },
 
@@ -18,10 +22,36 @@ module.exports = {
     callback();
   },
 
+  _matchRoute: function(test) {
+    var location = {pathname: '/foo/123/baz/abc'};
+    var matchedRoute = this.router._matchRoute(this.routes,location);
+
+    test.deepEqual(matchedRoute, 'fooIdBazGuidCallback ' + location);
+    test.done();
+  },
+
+  _parsePath: function(test) {
+    var location = {pathname: '/foo/123/baz/abc'};
+
+    test.deepEqual(_parsePath('/foo/:id/baz/:guid', location), {
+      pathname: '/foo/123/baz/abc', 
+      params: { id: '123', guid: 'abc' }
+    });
+
+    test.done();
+  },
+
   _invokeCallback: function (test) {
     callbackValue = this.router._invokeCallback(this.routes, '/foo', "location");
 
     test.equal(callbackValue, 'fooCallback location');
+    test.done();
+  },
+
+  _findMatchingRoute: function(test) {
+    var activeRoute = _findMatchingRoute(this.routes, '/foo/123');
+    test.equal(activeRoute, '/foo/:id');
+
     test.done();
   },
 
@@ -38,12 +68,11 @@ module.exports = {
     var routes = Object.keys(routesFixture);
 
     // assertion helper
-    var self = this;
     function assertMatch(route, location, nonMatchingRoutes) {
-      test.ok(self.router._match(route, location));
+      test.ok(_match(route, location));
 
       nonMatchingRoutes.forEach(function(route, location) {
-        test.ok(!self.router._match(route, location));
+        test.ok(!_match(route, location));
       });
     }
 
@@ -60,16 +89,15 @@ module.exports = {
     test.done();
   },
 
-  _findMatchingRoute: function(test) {
-    var activeRoute = this.router._findMatchingRoute(this.routes, '/foo/123');
-    test.equal(activeRoute, '/foo/:id');
+  _parseParams: function(test) {
+    var nestedParams = _parseParams('/foo/:id/baz/:guid', '/foo/123/baz/abc');
+    var rootParams   = _parseParams('/', '/');
+    var fooParams    = _parseParams('/foo', '/foo');
 
-    test.done();
-  },
+    test.deepEqual(nestedParams, {id: '123', guid: 'abc'});
+    test.deepEqual(rootParams, {});
+    test.deepEqual(fooParams, {});
 
-  _matchRoute: function(test) {
-    var matchedRoute = this.router._matchRoute(this.routes, '/foo/123/baz/abc');
-    test.equal(matchedRoute, 'fooIdBazGuidCallback /foo/123/baz/abc');
     test.done();
   }
 };
