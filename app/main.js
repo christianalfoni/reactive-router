@@ -36,7 +36,7 @@ const App = React.createClass({
     return (
       <div>
         <a style={{color: 'blue'}} href="/foo">Foo</a>
-        <a style={{color: 'blue'}} onClick={() => this.signals.urlChanged({path: '/foo/456'})}>Bar</a>
+        <a style={{color: 'blue'}} onClick={() => this.signals.urlChanged({pathname: '/foo/456'})}>Bar</a>
         <div>
           <Messages/>
         </div>
@@ -46,25 +46,26 @@ const App = React.createClass({
 });
 
 controller.signal('indexRouted', function fooRouted (args, state) {
-  state.set('url', args.path);
+  state.set('url', args.pathname);
 });
 
 controller.signal('fooRouted', function fooRouted (args, state) {
-  state.set('url', args.path);
+  state.set('url', args.pathname);
   state.set('messageId', null);
 });
 
 controller.signal('barRouted', function barRouted (args, state) {
-  state.set('url', args.path);
+  state.set('url', args.pathname);
 });
 
-controller.signal('messageRouted', function messageRoutedd (args, state) {
-  state.set('url', args.path);
+controller.signal('messageRouted', function messageRouted (args, state) {
+  state.set('url', args.pathname);
   state.set('messageId', args.params.id);
 });
 
 controller.signal('urlChanged', function urlChanged (args, state) {
-  state.set('url', args.path);
+  state.set('url', args.pathname);
+  router.set(args.pathname);
 });
 
 const router = Router({
@@ -72,16 +73,16 @@ const router = Router({
   '/foo': controller.signals.fooRouted,
   '/bar': controller.signals.barRouted,
   '/foo/:id': controller.signals.messageRouted
-}, {
-  hashbang: true
 });
 
-controller.eventEmitter.on('change', function (state) {
-  router.set(state.url);
-});
+router.listen();
 
-controller.eventEmitter.on('remember', function (state) {
-  router.setSilent(state.url);
-});
+// controller.eventEmitter.on('change', function(state) {
+//   router.set(state.url);
+// });
+
+// controller.eventEmitter.on('remember', function (state) {
+//   router.setSilent(state.url);
+// });
 
 React.render(controller.injectInto(App), document.body);
