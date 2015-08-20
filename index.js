@@ -9,12 +9,12 @@ var Router = function(routes, history) {
   return {
     listen: function() {
       var self = this;
-      this.urlListener = history.listen(function(location) {
+      this.unlisten = history.listen(function(location) {
         self._matchRoute(routes, location);
       });
     },
 
-    stopListening: function() { this.urlListener.unlisten(); },
+    stopListening: function() { this.unlisten(); },
 
     set: function(url) {
       history.pushState({}, url);
