@@ -5,7 +5,7 @@ var _parseParams       = Router._parseParams;
 var _parsePath         = Router._parsePath;
 
 module.exports = {
-  setUp: function (callback) {
+  setUp: function(callback) {
     this.routes = {
       '/':                  function(arg){ return 'rootCallback ' + arg; },
       '/foo':               function(arg){ return 'fooCallback ' + arg; },
@@ -17,9 +17,26 @@ module.exports = {
     callback();
   },
 
-  tearDown: function (callback) {
+  tearDown: function(callback) {
     this.router = null;
     callback();
+  },
+
+  set: function(test) {
+    history = {pushState: function(_,url) { return 'set ' + url; }};
+    this.router = Router(this.routes, history);
+
+    test.equal(this.router.set('/foo/bar'), 'set /foo/bar');
+    test.done();
+  },
+
+  setSilent: function(test) {
+    history = {pushState: function(_,url) { return 'set ' + url; }};
+    this.router = Router(this.routes, history);
+
+    test.equal(this.router.setSilent('/foo/bar'), 'set /foo/bar');
+    test.ok(this.router.isSilent);
+    test.done();
   },
 
   _matchRoute: function(test) {

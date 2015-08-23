@@ -17,13 +17,12 @@ var Router = function(routes, history) {
     stopListening: function() { this.unlisten(); },
 
     set: function(url) {
-      history.pushState({}, url);
+      return history.pushState({}, url);
     },
 
     setSilent: function(url) {
       this.isSilent = true;
-      this.set(url);
-      this.isSilent = false;
+      return this.set(url);
     },
 
     // "private" methods
@@ -38,6 +37,7 @@ var Router = function(routes, history) {
       if (!this.isSilent) {
         return routes[route].call(this, location);
       }
+      this.isSilent = false;
     },
 
     isSilent: false
