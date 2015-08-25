@@ -1,87 +1,25 @@
 'use strict';
-var history       = require('history');
-var createHistory = history.createHistory;
+var addressbar = require('addressbar');
+var utils = require('./src/utils.js');
 
-var Router = function(routes, history) {
-  // history requires DOM, stub during test
-  var history = history || createHistory();
+module.exports = function (routes) {
 
-  return {
-    listen: function() {
-      var self = this;
-      this.unlisten = history.listen(function(location) {
-        self._matchRoute(routes, location);
-      });
-    },
+  var runRoute = function (value) {
+    var path = value.replace(location.origin, '').replace('#', '');
+    var route = utils.findMatchingRoute(routes, path);
+    var params = utils.parseParams(route, path);
 
-    stopListening: function() { this.unlisten(); },
-
-    set: function(url) {
-      return history.pushState({}, url);
-    },
-
-    setSilent: function(url) {
-      this.isSilent = true;
-      return this.set(url);
-    },
-
-    // "private" methods
-    _matchRoute: function(routes, location) {
-      var route              = _findMatchingRoute(routes, location.pathname);
-      var locationWithParams = _parsePath(route, location);
-
-      return this._invokeCallback(routes, route, locationWithParams);
-    },
-
-    _invokeCallback: function(routes, route, location) {
-      if (!this.isSilent) {
-        return routes[route].call(this, location);
-      }
-      this.isSilent = false;
-    },
-
-    isSilent: false
+    routes[route]({
+      path: path,
+      params: params
+    });
   };
-}
 
-function _findMatchingRoute(routes, pathname) {
-  return Object.keys(routes).filter(function(route) {
-    return _match(route, pathname);
-  }).shift();
-}
+  runRoute(location.href);
 
-function _match(route, pathname) {
-  return _asRegex(route).test(pathname);
-}
-
-function _parsePath(route, location) {
-  var params      = _parseParams(route, location.pathname);
-  location.params = params;
-  return location;
-}
-
-function _parseParams(route, pathname) {
-  var urlValues       = _asRegex(route).exec(pathname);
-  var dynamicSegments = _asRegex(route).exec(route);
-  var params          = {};
-
-  if (urlValues && dynamicSegments) {
-    for(var i = 1; i < urlValues.length; i++) {
-      params[dynamicSegments[i].substr(1)] = urlValues[i];
-    }
+  return function (event) {
+    event.preventDefault();
+    runRoute(event.target.value);
   }
-  return params;
-}
 
-function _asRegex(route) {
-  var regexableRoute = '^' + route.replace(/:(\w+)/g, "(:?\\w+)") + '$';
-  return new RegExp(regexableRoute, 'g');
-}
-
-// exports
-Router._match             = _match;
-Router._findMatchingRoute = _findMatchingRoute;
-Router._parseParams       = _parseParams;
-Router._parsePath         = _parsePath;
-
-module.exports = Router;
+};

@@ -28,7 +28,8 @@ First of all this allows you to trigger a url change by just changing the "url" 
 reactive-router is a wrapper around [pagejs](https://visionmedia.github.io/page.js/), a neat little routing library built by **visionmedia**.
 
 ```js
-import ReactiveRouter from 'reactive-router';
+import addressbar from 'addressbar';
+import route from 'reactive-router';
 import state from './state.js';
 
 // state can be a store, controller, actions or whatever is responsible
@@ -51,24 +52,16 @@ const errorRouted = function (context) {
   state.set('currentPage', 'error');
 };
 
-/*
-  ROUTER
-  The way you define routes is changed. Pass one object to define all routes. 
-  Second argument is any Page JS options
-*/
-const router = ReactiveRouter({
+
+addressbar.on('change', route({
   '/home': homeRouted,
   '/messages/:id': messageRouted,
   '/error': errorRouted
-}, {
-  hashbang: true
-});
+}));
 
 // Listen to state changes and set the url
 state.on('change', function (state) {
-  router.set(state.url);
-  // or silently set, will not trigger the callback
-  router.setSilent(state.url);
+  addressbar.value = state.url;
 });
 ```
 

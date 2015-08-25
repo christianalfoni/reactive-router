@@ -1,14 +1,17 @@
-import Controller from 'cerebral-react-immutable-store';
+import Controller from 'cerebral';
+import Model from 'cerebral-immutable-store';
 
-const state = {
+import addressbar from 'addressbar';
+
+const model = Model({
   url: '/foo',
   messageId: null
+});
+
+const services = {
+  addressbar: addressbar
 };
 
-const defaultArgs = {
-
-};
-
-const controller = Controller(state, defaultArgs);
+const controller = Controller(model, services);
 
 export default controller;

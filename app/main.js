@@ -1,7 +1,8 @@
 import controller from './controller.js';
-import {Mixin} from 'cerebral-react-immutable-store';
+import {Container, Mixin} from 'cerebral-react';
 import React from 'react';
-import Router from './../index.js';
+import route from './../index.js';
+import addressbar from 'addressbar';
 
 const Messages = React.createClass({
   mixins: [Mixin],
@@ -35,8 +36,8 @@ const App = React.createClass({
   render() {
     return (
       <div>
-        <Link href="/foo">Foo</Link>
-        <Link href='/foo/456'>Bar</Link>
+        <a href="/foo">Foo</a>
+        <a href='/foo/456'>Bar</a>
         <div>
           <Messages/>
         </div>
@@ -45,77 +46,33 @@ const App = React.createClass({
   }
 });
 
-const Link = React.createClass({
-  mixins: [Mixin],
 
-  getInitialState: function() {
-    return {visited: false};
-  },
+function setUrl (input, state, output, services) {
+  state.set('url', input.path);
+}
 
-  onClick: function(e) {
-    e.preventDefault();
-    this.setState({visited: true});
-    this.signals.urlChanged({pathname: this.props.href});
-  },
+controller.signal('indexRouted', setUrl);
 
-  linkStyles: function() {
-    var styles = {textDecoration: 'underline'};
-    if (this.state.visited) {
-      styles['color'] = '#663366';
-    } else {
-      styles['color'] = 'blue';
-    }
-    return styles;
-  },
-
-  render() {
-    return (
-      <a style={this.linkStyles()}
-         onClick={this.onClick}>
-         {this.props.children}
-      </a>
-    );
-  }
-});
-
-controller.signal('indexRouted', function fooRouted (args, state) {
-  state.set('url', args.pathname);
-});
-
-controller.signal('fooRouted', function fooRouted (args, state) {
-  state.set('url', args.pathname);
+controller.signal('fooRouted', setUrl, function fooRouted (args, state) {
   state.set('messageId', null);
 });
 
-controller.signal('barRouted', function barRouted (args, state) {
-  state.set('url', args.pathname);
-});
+controller.signal('barRouted', setUrl);
 
-controller.signal('messageRouted', function messageRouted (args, state) {
-  state.set('url', args.pathname);
+controller.signal('messageRouted', setUrl, function messageRouted (args, state) {
   state.set('messageId', args.params.id);
 });
 
-controller.signal('urlChanged', function urlChanged (args, state) {
-  state.set('url', args.pathname);
-  router.set(args.pathname);
-});
 
-const router = Router({
+addressbar.on('change', route({
   '/': controller.signals.indexRouted,
   '/foo': controller.signals.fooRouted,
   '/bar': controller.signals.barRouted,
   '/foo/:id': controller.signals.messageRouted
+}));
+
+controller.on('change', function () {
+  console.log('CHANGE!');
+  addressbar.value = controller.get('url');
 });
-
-router.listen();
-
-// controller.eventEmitter.on('change', function(state) {
-//   router.set(state.url);
-// });
-
-// controller.eventEmitter.on('remember', function (state) {
-//   router.setSilent(state.url);
-// });
-
-React.render(controller.injectInto(App), document.body);
+React.render(<Container controller={controller} app={App}/>, document.body);
