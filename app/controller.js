@@ -1,15 +1,15 @@
 import Controller from 'cerebral';
 import Model from 'cerebral-immutable-store';
 
-import addressbar from 'addressbar';
+import route from './../index.js';
 
 const model = Model({
-  url: '/foo',
+  url: '/',
   messageId: null
 });
 
 const services = {
-  addressbar: addressbar
+  route: route
 };
 
 const controller = Controller(model, services);

@@ -1,7 +1,6 @@
 import controller from './controller.js';
 import {Container, Mixin} from 'cerebral-react';
 import React from 'react';
-import route from './../index.js';
 import addressbar from 'addressbar';
 
 const Messages = React.createClass({
@@ -33,11 +32,14 @@ const App = React.createClass({
       url: ['url']
     };
   },
+  componentWillMount() {
+    this.signals.urlChanged({url: location.href});
+  },
   render() {
     return (
       <div>
         <a href="/foo">Foo</a>
-        <a href='/foo/456'>Bar</a>
+        <a onClick={(e) => e.prevetDefault(); this.signals.urlChanged({url: '/foo/456'})}>Bar</a>
         <div>
           <Messages/>
         </div>
@@ -46,33 +48,40 @@ const App = React.createClass({
   }
 });
 
-
-function setUrl (input, state, output, services) {
-  state.set('url', input.path);
+function route (input, state, output, services) {
+  state.set('url', input.url);
+  services.route(input.url, {
+    '/': output.home,
+    '/foo': output.foo,
+    '/bar': output.bar,
+    '/foo/:id': output.message
+  });
 }
 
-controller.signal('indexRouted', setUrl);
+route.outputs = ['home', 'foo', 'bar', 'message'];
 
-controller.signal('fooRouted', setUrl, function fooRouted (args, state) {
+function unsetMessage (args, state) {
   state.set('messageId', null);
-});
+}
 
-controller.signal('barRouted', setUrl);
-
-controller.signal('messageRouted', setUrl, function messageRouted (args, state) {
+function setMessage (args, state) {
   state.set('messageId', args.params.id);
+}
+
+controller.signal('urlChanged', route, {
+  home: [],
+  foo: [unsetMessage],
+  bar: [],
+  message: [setMessage]
 });
 
-
-addressbar.on('change', route({
-  '/': controller.signals.indexRouted,
-  '/foo': controller.signals.fooRouted,
-  '/bar': controller.signals.barRouted,
-  '/foo/:id': controller.signals.messageRouted
-}));
+addressbar.on('change', function (event) {
+  event.preventDefault();
+  controller.signals.urlChanged({url: event.target.value});
+});
 
 controller.on('change', function () {
-  console.log('CHANGE!');
   addressbar.value = controller.get('url');
 });
+
 React.render(<Container controller={controller} app={App}/>, document.body);
