@@ -3,6 +3,9 @@ A reactive wrapper around Page JS
 
 > **The URL is like any other state**
 
+## DEPRECATED
+I have decided to deprecate this project, the reason being that we have developed [addressbar](https://github.com/christianalfoni/addressbar) and [url-mapper](https://github.com/christianalfoni/url-mapper). These projects encourages to move routing to something else than deciding what views/components to render, but result in something completely different. Typically related to state, but I think we can do a lot of cool stuff with urls. One example of what these projects has made us able to do is shown in [cerebral-router](https://github.com/cerebral/cerebral-router).
+
 ## What makes reactive-router different?
 When the router moved to the frontend it has been given a lot of different jobs. Keep track of and parse the current url, control the VIEW layer and often do data-fetching and handling transition states. The reactive-router is going back to the roots of what a router does, and that is pass a URL request to the controller layer of your application.
 
